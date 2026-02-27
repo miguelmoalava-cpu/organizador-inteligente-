@@ -1,71 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Organizador Rosa 🐱</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizador Pro 🐱</title>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css">
 
-  <!-- FullCalendar -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 </head>
 
 <body>
 
 <div class="app">
 
-  <h1>🐱 Organizador</h1>
-  <p id="summary"></p>
+<h1>🐱 Organizador</h1>
+<p id="summary"></p>
 
-  <div id="progressBarContainer">
-    <div id="progressBar"></div>
-  </div>
+<div id="progressBarContainer">
+  <div id="progressBar"></div>
+</div>
 
-  <div id="tasksContainer"></div>
+<div id="tasksContainer"></div>
 
-<h2 style="margin-top:30px;">📅 Calendario</h2>
-
+<h2>📅 Calendario</h2>
 <div id="calendarWrapper">
   <div id="calendarMini"></div>
 </div>
 
-<!-- Modal Calendario Expandido -->
-<div id="calendarModal" class="modal hidden">
-  <div class="modal-content calendar-expanded">
-    <h2>📅 Vista completa</h2>
-    <div id="calendarFull"></div>
-  </div>
-</div>
+<h2>📊 Estadísticas</h2>
+<canvas id="weeklyChart"></canvas>
 
-
-  <h2 style="margin-top:30px;">📊 Estadísticas</h2>
-  <canvas id="weeklyChart"></canvas>
-
-  <button id="addTaskBtn" class="floating-btn">＋</button>
+<button id="addTaskBtn" class="floating-btn">＋</button>
+<button onclick="reorganizarConIA()" class="ai-btn">🤖 IA</button>
 
 </div>
 
+<!-- Modal -->
 <div id="modal" class="modal hidden">
   <div class="modal-content">
-    <h2>Nueva tarea 💖</h2>
-
-    <input type="text" id="taskTitle" placeholder="¿Qué tienes que hacer?">
-   <input type="datetime-local" id="taskDate">
-
+    <h2 id="modalTitle">Nueva tarea ✨</h2>
+    <input type="text" id="taskTitle">
+    <input type="datetime-local" id="taskDateTime">
     <select id="taskPriority">
       <option value="low">🟢 Baja</option>
       <option value="medium">🟡 Media</option>
       <option value="high">🔴 Alta</option>
     </select>
-
     <button id="saveTaskBtn">Guardar</button>
   </div>
+</div>
+
+<div class="bottom-nav">
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠</button>
+  <button onclick="document.getElementById('calendarWrapper').scrollIntoView({behavior:'smooth'})">📅</button>
+  <button onclick="document.getElementById('weeklyChart').scrollIntoView({behavior:'smooth'})">📊</button>
 </div>
 
 <script src="app.js"></script>
