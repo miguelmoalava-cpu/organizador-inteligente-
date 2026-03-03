@@ -13,10 +13,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- ✅ Axios (para IA) -->
+<!-- Axios (IA) -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<!-- ✅ Confetti -->
+<!-- Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 </head>
@@ -25,31 +25,40 @@
 
 <div class="app">
 
-<h1>🐱 Organizador</h1>
-<p id="summary"></p>
+  <h1>🐱 Organizador</h1>
+  <p id="summary"></p>
 
-<div id="progressBarContainer">
-  <div id="progressBar"></div>
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+
+  <!-- TAREAS -->
+  <div id="tasksContainer"></div>
+
+  <!-- CALENDARIO -->
+  <h2>📅 Calendario</h2>
+  <div id="calendarWrapper">
+    <div id="calendarMini"></div>
+  </div>
+
+  <!-- SISTEMA DE NIVEL -->
+  <h2>📊 Estadísticas</h2>
+  <div id="levelSystem"></div>
+
+  <!-- FINANZAS -->
+  <h2>💰 Finanzas</h2>
+  <div id="financeSummary"></div>
+  <div id="financeContainer"></div>
+
+  <!-- BOTONES FLOTANTES -->
+  <button id="addTaskBtn" class="floating-btn">＋</button>
+  <button id="addTransactionBtn" class="floating-btn finance-btn">💸</button>
+
 </div>
 
-<div id="tasksContainer"></div>
-
-<h2>📅 Calendario</h2>
-<div id="calendarWrapper">
-  <div id="calendarMini"></div>
-</div>
-
-<h2>📊 Estadísticas</h2>
-<div id="levelSystem"></div>
-
-<button id="addTaskBtn" class="floating-btn">＋</button>
-
-</div>
-
-<!-- Modal Nueva Tarea -->
+<!-- MODAL NUEVA TAREA -->
 <div id="modal" class="modal hidden">
   <div class="modal-content">
-    <!-- ✅ AQUÍ ESTABA EL ERROR -->
     <h2 id="modalTitle">Nueva tarea ✨</h2>
     <input type="text" id="taskTitle" placeholder="Ej: Estudiar mañana 6pm">
     <input type="datetime-local" id="taskDateTime">
@@ -62,14 +71,27 @@
   </div>
 </div>
 
-<!-- Barra inferior -->
+<!-- MODAL FINANZAS -->
+<div id="financeModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Nueva Transacción</h2>
+    <select id="transactionType">
+      <option value="ingreso">💵 Ingreso</option>
+      <option value="gasto">💸 Gasto</option>
+    </select>
+    <input type="number" id="transactionAmount" placeholder="Monto">
+    <input type="text" id="transactionDescription" placeholder="Descripción">
+    <button id="saveTransactionBtn">Guardar</button>
+  </div>
+</div>
+
+<!-- BARRA INFERIOR -->
 <div class="bottom-nav">
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠</button>
   <button onclick="document.getElementById('calendarWrapper').scrollIntoView({behavior:'smooth'})">📅</button>
-  <button onclick="document.getElementById('weeklyChart').scrollIntoView({behavior:'smooth'})">📊</button>
+  <button onclick="document.getElementById('levelSystem').scrollIntoView({behavior:'smooth'})">📊</button>
 </div>
 
-<!-- ✅ IMPORTANTE: defer -->
 <script src="app.js" defer></script>
 
 </body>
