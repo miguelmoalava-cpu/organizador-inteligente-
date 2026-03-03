@@ -1,26 +1,64 @@
+/* =========================
+   VARIABLES GLOBALES
+========================= */
+
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let points = parseInt(localStorage.getItem("points")) || 0;
 let streak = parseInt(localStorage.getItem("streak")) || 0;
 let lastCompletedDay = localStorage.getItem("lastCompletedDay") || null;
 
-const OPENAI_API_KEY = "sk-...fY0A";
-
-const container = document.getElementById("tasksContainer");
-const modal = document.getElementById("modal");
-const addBtn = document.getElementById("addTaskBtn");
-const saveBtn = document.getElementById("saveTaskBtn");
-const progressBar = document.getElementById("progressBar");
-const summary = document.getElementById("summary");
+let container;
+let modal;
+let addBtn;
+let saveBtn;
+let progressBar;
+let summary;
+let calendarMini;
 
 let editingTaskId = null;
 
-addBtn.onclick = () => {
-  editingTaskId = null;
-  document.getElementById("modalTitle").innerText = "Nueva tarea ✨";
-  modal.classList.remove("hidden");
-};
+/* =========================
+   INICIO CUANDO CARGA DOM
+========================= */
 
-saveBtn.onclick = saveTask;
+document.addEventListener("DOMContentLoaded", () => {
+
+  container = document.getElementById("tasksContainer");
+  modal = document.getElementById("modal");
+  addBtn = document.getElementById("addTaskBtn");
+  saveBtn = document.getElementById("saveTaskBtn");
+  progressBar = document.getElementById("progressBar");
+  summary = document.getElementById("summary");
+
+  addBtn.onclick = () => {
+    editingTaskId = null;
+    document.getElementById("taskTitle").value = "";
+    document.getElementById("taskDateTime").value = "";
+    modal.classList.remove("hidden");
+  };
+
+  saveBtn.onclick = saveTask;
+
+  /* CALENDARIO */
+  calendarMini = new FullCalendar.Calendar(
+    document.getElementById("calendarMini"),
+    {
+      initialView: "dayGridMonth",
+      height: 300
+    }
+  );
+
+  calendarMini.render();
+
+  autoTheme();
+  setInterval(autoTheme, 60000);
+
+  render();
+});
+
+/* =========================
+   GUARDAR TAREA
+========================= */
 
 function saveTask() {
   const titleInput = document.getElementById("taskTitle");
@@ -52,14 +90,17 @@ function saveTask() {
 
   localStorage.setItem("tasks", JSON.stringify(tasks));
   modal.classList.add("hidden");
-  titleInput.value = "";
   editingTaskId = null;
+
   render();
 }
 
+/* =========================
+   RENDER
+========================= */
+
 function render() {
   container.innerHTML = "";
-  const today = new Date().toISOString().split("T")[0];
 
   tasks.forEach(task => {
     if (task.completed) return;
@@ -78,14 +119,19 @@ function render() {
 
   updateProgress();
   updateCalendar();
-  updateChart();
+  updateLevelSystem();
 }
+
+/* =========================
+   COMPLETAR TAREA
+========================= */
 
 function completeTask(id) {
   const task = tasks.find(t => t.id === id);
   task.completed = true;
 
   const today = new Date().toISOString().split("T")[0];
+
   if (lastCompletedDay !== today) {
     streak++;
     lastCompletedDay = today;
@@ -98,20 +144,27 @@ function completeTask(id) {
   localStorage.setItem("streak", streak);
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
-  lanzarConfetti();
-  showCompleteAnimation();
   render();
 }
 
+/* =========================
+   EDITAR
+========================= */
+
 function editTask(id) {
   const task = tasks.find(t => t.id === id);
+
   editingTaskId = id;
-  document.getElementById("modalTitle").innerText = "Editar tarea ✏️";
   document.getElementById("taskTitle").value = task.title;
   document.getElementById("taskDateTime").value = task.date;
   document.getElementById("taskPriority").value = task.priority;
+
   modal.classList.remove("hidden");
 }
+
+/* =========================
+   ELIMINAR
+========================= */
 
 function deleteTask(id) {
   tasks = tasks.filter(t => t.id !== id);
@@ -119,21 +172,75 @@ function deleteTask(id) {
   render();
 }
 
-function lanzarConfetti() {
-  confetti({
-    particleCount: 150,
-    spread: 80,
-    origin: { y: 0.6 }
-  });
+/* =========================
+   CALENDARIO
+========================= */
+
+function updateCalendar() {
+  if (!calendarMini) return;
+
+  calendarMini.removeAllEvents();
+
+  tasks
+    .filter(t => !t.completed)
+    .forEach(t => {
+      calendarMini.addEvent({
+        title: t.title,
+        start: t.date,
+        color:
+          t.priority === "high"
+            ? "red"
+            : t.priority === "medium"
+            ? "orange"
+            : "green"
+      });
+    });
 }
 
-function showCompleteAnimation() {
-  const popup = document.createElement("div");
-  popup.className = "complete-popup";
-  popup.innerText = "✨ ¡Tarea completada! +10 pts";
-  document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 2000);
+/* =========================
+   NIVEL VIDEOJUEGO
+========================= */
+
+function updateLevelSystem() {
+  const levelContainer = document.getElementById("levelSystem");
+  if (!levelContainer) return;
+
+  const xp = points;
+  const level = Math.floor(xp / 100) + 1;
+  const xpCurrentLevel = xp % 100;
+  const xpNeeded = 100;
+
+  const percent = (xpCurrentLevel / xpNeeded) * 100;
+
+  levelContainer.innerHTML = `
+    <div class="level-card">
+      <h2>⭐ Nivel ${level}</h2>
+      <div class="xp-bar-container">
+        <div class="xp-bar" style="width:${percent}%"></div>
+      </div>
+      <p>${xpCurrentLevel} / ${xpNeeded} XP</p>
+      <p>🔥 Racha: ${streak} días</p>
+      <p>💎 Puntos totales: ${points}</p>
+    </div>
+  `;
 }
+
+/* =========================
+   PROGRESO SUPERIOR
+========================= */
+
+function updateProgress() {
+  const completed = tasks.filter(t => t.completed).length;
+  const percent =
+    tasks.length === 0 ? 0 : (completed / tasks.length) * 100;
+
+  progressBar.style.width = percent + "%";
+  summary.innerText = `⭐ ${points} pts | 🔥 Racha: ${streak} días`;
+}
+
+/* =========================
+   PARSER SIMPLE DE FECHA
+========================= */
 
 function parseNaturalDate(text) {
   const lower = text.toLowerCase();
@@ -150,111 +257,22 @@ function parseNaturalDate(text) {
       tomorrow.setHours(hour, 0);
     }
 
-    return tomorrow.toISOString().slice(0,16);
+    return tomorrow.toISOString().slice(0, 16);
   }
 
   return null;
 }
 
-/* CALENDARIO */
-
-let calendarMini;
-
-document.addEventListener("DOMContentLoaded", () => {
-  calendarMini = new FullCalendar.Calendar(
-    document.getElementById("calendarMini"),
-    {
-      initialView: "dayGridMonth",
-      height: 300
-    }
-  );
-  calendarMini.render();
-  render();
-});
-
-function updateCalendar() {
-  if (!calendarMini) return;
-  calendarMini.removeAllEvents();
-  tasks.filter(t => !t.completed).forEach(t => {
-    calendarMini.addEvent({
-      title: t.title,
-      start: t.date,
-      color: t.priority === "high" ? "red" :
-             t.priority === "medium" ? "orange" : "green"
-    });
-  });
-}
-
-/* CHART */
-
-let chart;
-
-function updateChart() {
-  const completed = tasks.filter(t => t.completed).length;
-  const pending = tasks.filter(t => !t.completed).length;
-
-  const ctx = document.getElementById("weeklyChart");
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Completadas", "Pendientes"],
-      datasets: [{
-        data: [completed, pending]
-      }]
-    }
-  });
-}
-
-function updateProgress() {
-  const completed = tasks.filter(t => t.completed).length;
-  const percent = tasks.length === 0 ? 0 : (completed / tasks.length) * 100;
-  progressBar.style.width = percent + "%";
-  summary.innerText = `⭐ ${points} pts | 🔥 Racha: ${streak} días`;
-}
-
-/* IA REAL */
-
-async function reorganizarConIA() {
-  if (tasks.length === 0) return alert("No hay tareas");
-
-  try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "Organiza tareas por urgencia y fecha." },
-          { role: "user", content: JSON.stringify(tasks) }
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-
-    alert(response.data.choices[0].message.content);
-
-  } catch (err) {
-    alert("Error conectando IA");
-  }
-}
-
-/* DARK MODE AUTO */
+/* =========================
+   DARK MODE AUTO
+========================= */
 
 function autoTheme() {
   const hour = new Date().getHours();
+
   if (hour >= 19 || hour < 6) {
     document.body.classList.add("dark-mode");
   } else {
     document.body.classList.remove("dark-mode");
   }
 }
-
-autoTheme();
-setInterval(autoTheme, 60000);
