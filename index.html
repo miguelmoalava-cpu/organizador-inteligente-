@@ -12,6 +12,13 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ✅ Axios (para IA) -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- ✅ Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 </head>
 
 <body>
@@ -42,7 +49,8 @@
 <!-- Modal Nueva Tarea -->
 <div id="modal" class="modal hidden">
   <div class="modal-content">
-    <h2>Nueva tarea ✨</h2>
+    <!-- ✅ AQUÍ ESTABA EL ERROR -->
+    <h2 id="modalTitle">Nueva tarea ✨</h2>
     <input type="text" id="taskTitle" placeholder="Ej: Estudiar mañana 6pm">
     <input type="datetime-local" id="taskDateTime">
     <select id="taskPriority">
@@ -61,7 +69,8 @@
   <button onclick="document.getElementById('weeklyChart').scrollIntoView({behavior:'smooth'})">📊</button>
 </div>
 
-<script src="app.js"></script>
+<!-- ✅ IMPORTANTE: defer -->
+<script src="app.js" defer></script>
 
 </body>
 </html>
