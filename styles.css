@@ -1,3 +1,4 @@
+
 * { box-sizing: border-box; }
 
 body {
@@ -71,19 +72,28 @@ h2 {
 
 .floating-btn {
   position: fixed;
-  bottom: 80px;
   right: 20px;
-  background: linear-gradient(135deg, #f472b6, #ec4899);
-  color: white;
-  border: none;
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  font-size: 30px;
+  font-size: 28px;
+  border: none;
   cursor: pointer;
-  box-shadow: 0 10px 25px rgba(236,72,153,0.4);
-  transition: transform 0.2s ease;
-  z-index: 50;
+  z-index: 1000;
+}
+
+/* Botón de tareas */
+#addTaskBtn {
+  bottom: 20px;
+  background: #4CAF50;
+  color: white;
+}
+
+/* Botón de finanzas */
+.finance-btn {
+  bottom: 100px; /* lo subimos arriba */
+  background: #ff9800;
+  color: white;
 }
 
 .floating-btn:hover {
